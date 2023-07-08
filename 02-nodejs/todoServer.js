@@ -46,4 +46,61 @@ const app = express();
 
 app.use(bodyParser.json());
 
+let todos = [];
+var idCounter = 0;
+
+function findIndex(arr, id) {
+  for(let i=0; i<arr.length; i++) {
+    if(arr[i].id == id) return i;
+  }
+  return -1;
+}
+
+app.get('/todos', (req, res) => {
+  res.json(todos);
+});
+
+app.get('/todos/:id', (req, res) => {
+  const index = findIndex(todos, req.params.id);
+  if(index == -1) {
+    res.status(404).send();
+  } else {
+    res.json(todos[index]);
+  }
+});
+
+app.post('/todos', (req,res) => {
+  const newTodo = {
+    id: idCounter++,
+    title: req.body.title,
+    description: req.body.description
+  }
+  todos.push(newTodo);
+  res.status(201).json(newTodo);
+})
+
+app.put('/todos/:id', (req,res) => {
+  const index = findIndex(todos, req.params.id);
+  if(index == -1) {
+    res.status(404).send();
+  } else {
+    todos[id] = req.body;
+    res.status(200).json(req.body);
+  }
+})
+
+app.delete('todos/:id', (req,res) => {
+  const index = findIndex(todos, req.params.id);
+  if(index == -1) {
+    res.status(404).send();
+  } else {
+    todos.splice(index, 1);
+    res.status(200).send();
+  }
+})
+
+app.use((req,res, next) => {
+  res.status(404).send();
+})
+
 module.exports = app;
